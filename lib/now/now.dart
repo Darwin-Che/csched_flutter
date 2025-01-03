@@ -1,10 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:csched_flutter/app/app_router.gr.dart';
 import 'package:csched_flutter/helper/date_minute.dart';
+import 'package:csched_flutter/helper/time_helper.dart';
+import 'package:csched_flutter/helper/widget_style.dart';
 import 'package:csched_flutter/now/bloc/now_bloc.dart';
 import 'package:csched_flutter/now/bloc/timer_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tasks_api/tasks_api.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 
 @RoutePage()
@@ -32,14 +35,17 @@ class NowPage extends StatelessWidget {
           create: (context) => TimerCubit()..startTimer(),
         )
       ],
-      child: const NowView(),
+      child: NowView(),
     );
   }
 }
 
 @RoutePage()
 class NowView extends StatelessWidget {
-  const NowView({super.key});
+  final TextEditingController _controllerStartComment = TextEditingController();
+  final TextEditingController _controllerEndComment = TextEditingController();
+
+  NowView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +59,9 @@ class NowView extends StatelessWidget {
                 listeners: [
               BlocListener<NowBloc, NowState>(
                 listenWhen: (previous, current) =>
-                    previous.runtimeType != current.runtimeType,
+                    previous.status != current.status,
                 listener: (context, state) {
-                  if (state is ErrorNowState) {
+                  if (state.status == NowStateStatus.failure) {
                     ScaffoldMessenger.of(context)
                       ..hideCurrentSnackBar()
                       ..showSnackBar(
@@ -68,90 +74,208 @@ class NowView extends StatelessWidget {
               ),
             ],
                 child: BlocBuilder<NowBloc, NowState>(
-                    builder: (context, nowState) =>
-                        BlocBuilder<TimerCubit, int>(
-                            builder: (context, timerState) {
-                          final isDuringProgress = (nowState
-                                  is LastestProgressNowState) &&
-                              (nowState.progressModel != null) &&
-                              (nowState.progressModel!.endDm * 60 > timerState);
-                          if (isDuringProgress) {
-                            final progressModel =
-                                (nowState as LastestProgressNowState)
-                                    .progressModel!;
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("Current Task"),
-                                Text(progressModel.taskId),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(DateMinute.fromInt(
-                                            progressModel.startDm)
-                                        .toHHMM()),
-                                    SizedBox(
-                                      width: 100,
-                                      child: LinearProgressIndicator(
-                                        value: (timerState -
-                                                progressModel.startDm * 60) /
-                                            (progressModel.endDm * 60 -
-                                                progressModel.startDm * 60),
-                                        backgroundColor: Colors.grey[300],
-                                        color: Colors.blue,
-                                        minHeight: 10,
-                                      ),
+                    builder: (context, nowState) {
+                  _controllerStartComment.text =
+                      (nowState).progressModel?.startComment ?? "";
+                  _controllerEndComment.text =
+                      (nowState).progressModel?.endComment ?? "";
+
+                  return BlocBuilder<TimerCubit, int>(
+                      builder: (context, timerState) {
+                    if (nowState.progressModel == null) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("Start you first Progress!"),
+                          TextButton(
+                            child: Text("SWITCH"),
+                            onPressed: () =>
+                                {context.pushRoute(const SwitchRoute())},
+                          ),
+                        ],
+                      );
+                    }
+
+                    if (nowState.taskModel == null) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                              "Error: The task associated with the progress is not found"),
+                          TextButton(
+                            child: Text("SWITCH"),
+                            onPressed: () =>
+                                {context.pushRoute(const SwitchRoute())},
+                          ),
+                        ],
+                      );
+                    }
+
+                    final progressModel = nowState.progressModel!;
+                    final taskModel = nowState.taskModel!;
+
+                    final isProgressActive =
+                        progressModel.endDm * 60 > timerState;
+
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (!isProgressActive) SectionTitle(text: "Pending"),
+                        if (!isProgressActive)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+                            child: Text(
+                              TimeHelper.formatSeconds(
+                                  DateTime.now().millisecondsSinceEpoch ~/
+                                          1000 -
+                                      progressModel.endDm * 60),
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        if (!isProgressActive) Divider(),
+                        if (!isProgressActive) SectionTitle(text: "Previous Task"),
+                        if (isProgressActive) SectionTitle(text: "Current Task"),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
+                          child: Text(
+                            "${taskModel.name}",
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blueGrey),
+                          ),
+                        ),
+                        _ProgressBar(
+                          progressModel: progressModel,
+                          curSecond: timerState,
+                        ),
+                        SizedBox(height: 28),
+                        LayoutBuilder(builder: (context, constraints) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              SizedBox(
+                                width: constraints.maxWidth / 2 - 20,
+                                child: TextFormField(
+                                    style: TextStyle(fontSize: 12),
+                                    controller: _controllerStartComment,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: 8,
+                                    minLines: 8,
+                                    inputFormatters: [],
+                                    textAlign: TextAlign.left,
+                                    decoration: InputDecoration(
+                                      hintText: "StartComment",
+                                      isDense: true,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 8, horizontal: 8),
+                                      border: OutlineInputBorder(),
                                     ),
-                                    Text(DateMinute.fromInt(progressModel.endDm)
-                                        .toHHMM()),
-                                  ],
+                                    onChanged: (value) {
+                                      context.read<NowBloc>().add(
+                                          CommentChanged(startComment: value));
+                                    }),
+                              ),
+                              SizedBox(
+                                width: constraints.maxWidth / 2 - 20,
+                                child: TextFormField(
+                                    style: TextStyle(fontSize: 12),
+                                    controller: _controllerEndComment,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: 8,
+                                    minLines: 8,
+                                    inputFormatters: [],
+                                    textAlign: TextAlign.left,
+                                    decoration: InputDecoration(
+                                      hintText: "EndComment",
+                                      isDense: true,
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 8, horizontal: 8),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    onChanged: (value) {
+                                      context.read<NowBloc>().add(
+                                          CommentChanged(endComment: value));
+                                    }),
+                              ),
+                            ],
+                          );
+                        }),
+                        Spacer(),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  minimumSize:
+                                      Size(240, 50), // Minimum height of 50
                                 ),
-                                Text(
-                                    '${timerState ~/ 60 - progressModel.startDm} / ${progressModel.duration}'),
-                                Spacer(),
-                                TextButton(
-                                  child: Text("SWITCH"),
-                                  onPressed: () =>
-                                      {context.pushRoute(const SwitchRoute())},
+                                onPressed: () {
+                                  context.pushRoute(const SwitchRoute());
+                                },
+                                child: Text(
+                                  isProgressActive ? "Switch Early" : "On to Next",
+                                  style: TextStyle(fontSize: 16),
                                 ),
-                              ],
-                            );
-                          } else if (nowState is LastestProgressNowState &&
-                              nowState.progressModel != null) {
-                            final lastProgress = nowState.progressModel!;
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("Pending"),
-                                Text(
-                                    "${DateTime.now().millisecondsSinceEpoch ~/ 1000} - ${lastProgress.endDm}"),
-                                Text("Previous Task"),
-                                Text("${lastProgress.taskId}"),
-                                Spacer(),
-                                TextButton(
-                                  child: Text("SWITCH"),
-                                  onPressed: () =>
-                                      {context.pushRoute(const SwitchRoute())},
-                                ),
-                              ],
-                            );
-                          } else {
-                            return Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text("Start you first Progress!"),
-                                TextButton(
-                                  child: Text("SWITCH"),
-                                  onPressed: () =>
-                                      {context.pushRoute(const SwitchRoute())},
-                                ),
-                              ],
-                            );
-                          }
-                        })))));
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  });
+                }))));
+  }
+}
+
+class _ProgressBar extends StatelessWidget {
+  final ProgressModel progressModel;
+  final int curSecond;
+
+  const _ProgressBar({required this.progressModel, required this.curSecond});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        LayoutBuilder(
+          builder: (context, constraints) => Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                DateMinute.fromInt(progressModel.startDm).toHHMM() + "  ",
+                style: TextStyle(fontSize: 18),
+              ),
+              SizedBox(
+                width: constraints.maxWidth / 2,
+                child: LinearProgressIndicator(
+                  borderRadius: BorderRadius.circular(5),
+                  value: (curSecond - progressModel.startDm * 60) /
+                      (progressModel.endDm * 60 - progressModel.startDm * 60),
+                  backgroundColor: Colors.grey[300],
+                  color: Colors.amberAccent,
+                  minHeight: 10,
+                ),
+              ),
+              Text(
+                "  " + DateMinute.fromInt(progressModel.endDm).toHHMM(),
+                style: TextStyle(fontSize: 18),
+              ),
+            ],
+          ),
+        ),
+        // Text(
+        //     '${curSecond ~/ 60 - progressModel.startDm} / ${progressModel.duration}'),
+      ],
+    );
   }
 }

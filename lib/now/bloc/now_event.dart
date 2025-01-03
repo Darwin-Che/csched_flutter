@@ -10,3 +10,10 @@ sealed class NowEvent extends Equatable {
 final class LatestProgressSubscriptionRequested extends NowEvent {
   const LatestProgressSubscriptionRequested();
 }
+
+final class CommentChanged extends NowEvent {
+  final String? startComment;
+  final String? endComment;
+
+  const CommentChanged({this.startComment, this.endComment});
+}

@@ -14,14 +14,14 @@ final class TaskEditState extends Equatable {
     this.status = TaskEditStatus.initial,
     this.initialTask,
     required this.name,
-    required this.priority,
+    required this.targetEffort,
     this.description = '',
   });
 
   final TaskEditStatus status;
   final TaskModel? initialTask;
   final String name;
-  final int priority;
+  final int targetEffort;
   final String description;
 
   bool get isNewTask => initialTask == null;
@@ -37,11 +37,11 @@ final class TaskEditState extends Equatable {
       status: status ?? this.status,
       initialTask: initialTask ?? this.initialTask,
       name: name ?? this.name,
-      priority: priority ?? this.priority,
+      targetEffort: priority ?? this.targetEffort,
       description: description ?? this.description,
     );
   }
 
   @override
-  List<Object?> get props => [status, initialTask, name, priority, description];
+  List<Object?> get props => [status, initialTask, name, targetEffort, description];
 }

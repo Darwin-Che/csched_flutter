@@ -38,8 +38,8 @@ class ProgressModel extends Equatable {
     String? id,
     String? taskId,
     int? duration,
-    int? startTs,
-    int? endTs,
+    int? startDm,
+    int? endDm,
     String? startComment,
     String? endComment,
   }) {
@@ -47,8 +47,8 @@ class ProgressModel extends Equatable {
       id: id ?? this.id,
       taskId: taskId ?? this.taskId,
       duration: duration ?? this.duration,
-      startDm: startTs ?? this.startDm,
-      endDm: endTs ?? this.endDm,
+      startDm: startDm ?? this.startDm,
+      endDm: endDm ?? this.endDm,
       startComment: startComment ?? this.startComment,
       endComment: endComment ?? this.endComment,
     );

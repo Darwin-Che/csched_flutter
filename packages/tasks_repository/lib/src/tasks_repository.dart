@@ -13,11 +13,15 @@ class TasksRepository {
 
   List<TaskModel> getTaskModels() => _tasksApi.getTaskModels();
 
+  TaskModel findTaskModel(String id) => _tasksApi.findTaskModel(id);
+
   Future<void> saveTaskModel(TaskModel taskModel) => _tasksApi.saveTaskModel(taskModel);
 
   Future<void> deleteTaskModel(String id) => _tasksApi.deleteTaskModel(id);
 
-  Stream<ProgressModel?> getLatestProgressModel() => _tasksApi.getLatestProgressModel();
+  Stream<ProgressModel?> getLatestProgressModelStream() => _tasksApi.getLatestProgressModelStream();
+
+  ProgressModel? getLatestProgressModel() => _tasksApi.getLatestProgressModel();
 
   Future<void> editLatestProgressModel(ProgressModel progressModel) => _tasksApi.editLatestProgressModel(progressModel);
 

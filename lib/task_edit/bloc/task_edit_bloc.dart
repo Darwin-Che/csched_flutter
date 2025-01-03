@@ -14,12 +14,12 @@ class TaskEditBloc extends Bloc<TaskEditEvent, TaskEditState> {
           TaskEditState(
             initialTask: initialTask,
             name: initialTask?.name ?? '',
-            priority: initialTask?.targetEffort ?? 0,
+            targetEffort: initialTask?.targetEffort ?? 0,
             description: initialTask?.description ?? '',
           ),
         ) {
     on<TaskEditTaskNameChanged>(_onNameChanged);
-    on<TaskEditPriorityChanged>(_onPriorityChanged);
+    on<TaskEditTargetEffortChanged>(_onPriorityChanged);
     on<TaskEditDescriptionChanged>(_onDescriptionChanged);
     on<TaskEditSubmitted>(_onSubmitted);
   }
@@ -34,10 +34,10 @@ class TaskEditBloc extends Bloc<TaskEditEvent, TaskEditState> {
   }
 
   void _onPriorityChanged(
-    TaskEditPriorityChanged event,
+    TaskEditTargetEffortChanged event,
     Emitter<TaskEditState> emit,
   ) {
-    emit(state.copyWith(priority: event.priority));
+    emit(state.copyWith(priority: event.targetEffort));
   }
 
   void _onDescriptionChanged(
@@ -54,7 +54,7 @@ class TaskEditBloc extends Bloc<TaskEditEvent, TaskEditState> {
     emit(state.copyWith(status: TaskEditStatus.loading));
     final task = (state.initialTask ?? TaskModel()).copyWith(
       name: state.name,
-      priority: state.priority,
+      priority: state.targetEffort,
       description: state.description,
     );
 

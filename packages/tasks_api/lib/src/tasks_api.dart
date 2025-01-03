@@ -10,11 +10,15 @@ abstract class TasksApi {
 
   List<TaskModel> getTaskModels();
 
+  TaskModel findTaskModel(String id);
+
   Future<void> saveTaskModel(TaskModel taskModel);
 
   Future<void> deleteTaskModel(String id);
 
-  Stream<ProgressModel?> getLatestProgressModel();
+  Stream<ProgressModel?> getLatestProgressModelStream();
+
+  ProgressModel? getLatestProgressModel();
 
   Future<void> editLatestProgressModel(ProgressModel progressModel);
 

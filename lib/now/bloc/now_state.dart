@@ -1,22 +1,30 @@
 part of 'now_bloc.dart';
 
-sealed class NowState extends Equatable {
-  const NowState();
-  
-  @override
-  List<Object?> get props => [];
-}
+enum NowStateStatus { initial, loading, success, failure }
 
-final class InitialNowState extends NowState {}
-final class LoadingNowState extends NowState {}
+class NowState extends Equatable {
+  const NowState({
+    required this.status,
+    this.progressModel,
+    this.taskModel,
+  });
 
-final class LastestProgressNowState extends NowState {
+  final NowStateStatus status;
   final ProgressModel? progressModel;
+  final TaskModel? taskModel;
 
-  const LastestProgressNowState({required this.progressModel});
+  NowState copyWith({
+    NowStateStatus? status,
+    ProgressModel? progressModel,
+    TaskModel? taskModel,
+  }) {
+    return NowState(
+      status: status ?? this.status,
+      progressModel: progressModel ?? this.progressModel,
+      taskModel: taskModel ?? this.taskModel,
+    );
+  }
 
   @override
-  List<Object?> get props => [progressModel];
+  List<Object?> get props => [status, progressModel, taskModel];
 }
-
-final class ErrorNowState extends NowState {}

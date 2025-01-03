@@ -77,10 +77,13 @@ class NowRouteWrapper extends _i7.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.NowView]
-class NowView extends _i7.PageRouteInfo<void> {
-  const NowView({List<_i7.PageRouteInfo>? children})
-      : super(
+class NowView extends _i7.PageRouteInfo<NowViewArgs> {
+  NowView({
+    _i8.Key? key,
+    List<_i7.PageRouteInfo>? children,
+  }) : super(
           NowView.name,
+          args: NowViewArgs(key: key),
           initialChildren: children,
         );
 
@@ -89,20 +92,29 @@ class NowView extends _i7.PageRouteInfo<void> {
   static _i7.PageInfo page = _i7.PageInfo(
     name,
     builder: (data) {
-      return const _i2.NowView();
+      final args = data.argsAs<NowViewArgs>(orElse: () => const NowViewArgs());
+      return _i2.NowView(key: args.key);
     },
   );
 }
 
+class NowViewArgs {
+  const NowViewArgs({this.key});
+
+  final _i8.Key? key;
+
+  @override
+  String toString() {
+    return 'NowViewArgs{key: $key}';
+  }
+}
+
 /// generated route for
 /// [_i3.SettingsPage]
-class SettingsRoute extends _i7.PageRouteInfo<SettingsRouteArgs> {
-  SettingsRoute({
-    _i8.Key? key,
-    List<_i7.PageRouteInfo>? children,
-  }) : super(
+class SettingsRoute extends _i7.PageRouteInfo<void> {
+  const SettingsRoute({List<_i7.PageRouteInfo>? children})
+      : super(
           SettingsRoute.name,
-          args: SettingsRouteArgs(key: key),
           initialChildren: children,
         );
 
@@ -111,22 +123,9 @@ class SettingsRoute extends _i7.PageRouteInfo<SettingsRouteArgs> {
   static _i7.PageInfo page = _i7.PageInfo(
     name,
     builder: (data) {
-      final args = data.argsAs<SettingsRouteArgs>(
-          orElse: () => const SettingsRouteArgs());
-      return _i3.SettingsPage(key: args.key);
+      return const _i3.SettingsPage();
     },
   );
-}
-
-class SettingsRouteArgs {
-  const SettingsRouteArgs({this.key});
-
-  final _i8.Key? key;
-
-  @override
-  String toString() {
-    return 'SettingsRouteArgs{key: $key}';
-  }
 }
 
 /// generated route for

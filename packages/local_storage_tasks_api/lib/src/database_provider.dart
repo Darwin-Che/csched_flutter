@@ -86,6 +86,10 @@ class DatabaseProvider {
           )
           ''');
         await db.execute('''
+          CREATE INDEX index_progress_endDm 
+            ON progress(endDm)
+          ''');
+        await db.execute('''
           CREATE TABLE goal (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,

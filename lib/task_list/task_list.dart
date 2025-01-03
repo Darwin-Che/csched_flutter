@@ -62,14 +62,25 @@ class TaskListView extends StatelessWidget {
             ),
           ],
           child: BlocBuilder<TaskListBloc, TaskListState>(
-              builder: (context, state) => ListView.builder(
-                  itemCount: state.tasks.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => {context.pushRoute(TaskEditRoute())},
-                      child: TaskListItem(task: state.tasks.elementAt(index)),
-                    );
-                  }))),
+              builder: (context, state) => ListView.separated(
+                    itemCount: state.tasks.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () => {
+                          context.pushRoute(TaskEditRoute(
+                              initialTask: state.tasks.elementAt(index)))
+                        },
+                        child: TaskListItem(task: state.tasks.elementAt(index)),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return Divider(
+                        color: Colors.grey,
+                        thickness: 1,
+                        height: 0,
+                      );
+                    },
+                  ))),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.pushRoute(TaskEditRoute());
@@ -86,26 +97,12 @@ class TaskListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Container(
-            height: 50,
-            color: Colors.red,
-            child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(task.name),
-                    Row(
-                      children: [
-                        Text('${task.targetEffort}'),
-                        SizedBox(width: 16),
-                        Text(task.status.value),
-                      ],
-                    )
-                  ],
-                ))));
+    return ListTile(
+      tileColor: Colors.blue.shade100,
+      leading: const Icon(Icons.label, color: Colors.blue),
+      title: Text(task.name, style: const TextStyle(fontSize: 20)),
+      trailing: Text('${task.targetEffort}',
+          style: const TextStyle(fontSize: 18)),
+    );
   }
 }

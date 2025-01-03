@@ -20,11 +20,11 @@ class SwitchCubit extends Cubit<SwitchState> {
     List<(TaskModel, double)> effortPercentageList = [];
     for (final task in tasks) {
       effortPercentageList
-          .add((task, (tasksEffort[task.id] ?? 0) / task.targetEffort));
+          .add((task, (tasksEffort[task.id] ?? 0) / 60));
     }
 
     // sort by effort percentage from small to large
-    effortPercentageList.sort((a, b) => a.$2.compareTo(b.$2));
+    effortPercentageList.sort((a, b) => (a.$2 / a.$1.targetEffort).compareTo(b.$2 / b.$1.targetEffort));
     final options = effortPercentageList
         .take(3)
         .map((record) =>
@@ -54,6 +54,12 @@ class SwitchCubit extends Cubit<SwitchState> {
     if (state.status == SwitchStateStatus.waiting) {
       if (state.selectedOption != null) {
         DateMinute now = DateMinute.now();
+        var currentProgress = _repo.getLatestProgressModel();
+        if (currentProgress!= null && currentProgress.endDm > now.toInt()) {
+          currentProgress.copyWith(endDm: now.toInt());
+          await _repo.editLatestProgressModel(currentProgress);
+        }
+
         await _repo.addNewProgressModel(ProgressModel(
           taskId: state.selectedOption!,
           duration: state.endDm - now,

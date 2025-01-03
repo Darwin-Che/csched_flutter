@@ -56,9 +56,15 @@ class LocalStorageTasksApi extends TasksApi {
     return _taskStreamController.asBroadcastStream();
   }
 
-    @override
+  @override
   List<TaskModel> getTaskModels() {
     return _taskStreamController.value;
+  }
+
+  @override
+  TaskModel findTaskModel(String id) {
+    return _taskStreamController.value
+        .firstWhere((taskModel) => taskModel.id == id);
   }
 
   @override
@@ -101,8 +107,13 @@ class LocalStorageTasksApi extends TasksApi {
   }
 
   @override
-  Stream<ProgressModel?> getLatestProgressModel() {
+  Stream<ProgressModel?> getLatestProgressModelStream() {
     return _latestProgressStreamController.asBroadcastStream();
+  }
+
+  @override
+  ProgressModel? getLatestProgressModel() {
+    return _latestProgressStreamController.value;
   }
 
   @override
@@ -136,6 +147,8 @@ class LocalStorageTasksApi extends TasksApi {
     }
 
     await db.insert('progress', progressModel.toJson());
+
+    _latestProgressStreamController.add(progressModel);
   }
 
   @override
@@ -152,12 +165,12 @@ class LocalStorageTasksApi extends TasksApi {
 
     Map<String, double> tasksEffort = {};
 
-    final curTs = DateTime.now().microsecondsSinceEpoch ~/ 60000;
+    final curDm = DateTime.now().millisecondsSinceEpoch ~/ 60000;
 
     // The algorithm would be to have each week's progress decrease by half
     for (final progress in progresses) {
       // check how many weeks are between the task and current time
-      final weeks = (curTs - progress.endDm) ~/ (24 * 60 * 7);
+      final weeks = (curDm - progress.endDm) ~/ (24 * 60 * 7);
       final multiplier = pow(2.0, weeks).toDouble();
 
       tasksEffort[progress.taskId] =
@@ -166,6 +179,4 @@ class LocalStorageTasksApi extends TasksApi {
 
     return tasksEffort;
   }
-  
-
 }

@@ -53,15 +53,20 @@ class SwitchView extends StatelessWidget {
 
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Options"),
-                      ListView.separated(
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        child: Text(
+                          "Task Options",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ListView.builder(
                         shrinkWrap: true,
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                         itemCount: state.options.length,
-                        separatorBuilder: (context, index) =>
-                            Divider(color: Colors.grey[400]),
                         itemBuilder: (context, index) {
                           final option = state.options[index];
                           return ListTile(
@@ -72,10 +77,10 @@ class SwitchView extends StatelessWidget {
                             leading:
                                 const Icon(Icons.label, color: Colors.blue),
                             title: Text(option.taskModel.name,
-                                style: const TextStyle(fontSize: 16)),
+                                style: const TextStyle(fontSize: 20)),
                             trailing: Text(
-                                '${option.effort} / ${option.taskModel.targetEffort}',
-                                style: const TextStyle(fontSize: 16)),
+                                '${option.effort.toStringAsFixed(1)} / ${option.taskModel.targetEffort}',
+                                style: const TextStyle(fontSize: 18)),
                             onTap: () {
                               context
                                   .read<SwitchCubit>()
@@ -84,80 +89,132 @@ class SwitchView extends StatelessWidget {
                           );
                         },
                       ),
+                      Divider(),
                       Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child: Row(
-                            children: [
-                              const Text("Duration",
-                                  style: TextStyle(fontSize: 16)),
-                              const Spacer(),
-                              SizedBox(
-                                width: 100,
-                                child: TextFormField(
-                                  controller: _controllerDuration,
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: [
-                                    FilteringTextInputFormatter
-                                        .digitsOnly, // Allows only digits
-                                    LengthLimitingTextInputFormatter(3),
-                                  ],
-                                  decoration: const InputDecoration(
-                                    labelText: "MMM",
-                                    border: OutlineInputBorder(),
+                        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
+                        child: Text(
+                          "Timing",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      ListView(
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        children: [
+                          Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                              child: Row(
+                                children: [
+                                  const Text("Duration",
+                                      style: TextStyle(fontSize: 18)),
+                                  const Spacer(),
+                                  SizedBox(
+                                    width: 50,
+                                    child: TextFormField(
+                                      style: TextStyle(fontSize: 18),
+                                      controller: _controllerDuration,
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter
+                                            .digitsOnly, // Allows only digits
+                                        LengthLimitingTextInputFormatter(3),
+                                      ],
+                                      textAlign: TextAlign.right,
+                                      decoration: InputDecoration(
+                                        isDense: true,
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 6, horizontal: 8),
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      onChanged: (value) {
+                                        if (value != "") {
+                                          context
+                                              .read<SwitchCubit>()
+                                              .setDuration(int.parse(value));
+                                        }
+                                      },
+                                    ),
                                   ),
-                                  onChanged: (value) {
-                                    context
-                                        .read<SwitchCubit>()
-                                        .setDuration(int.parse(value));
-                                  },
-                                ),
-                              ),
-                              const Text(" minutes",
-                                  style: TextStyle(fontSize: 16)),
-                            ],
-                          )),
-                      Padding(
-                          padding: EdgeInsets.all(32.0),
-                          child: Row(
-                            children: [
-                              Text("End at", style: TextStyle(fontSize: 16)),
-                              Spacer(),
-                              TextButton(
-                                child: Text(
-                                    "${state.endDm.localHour()} : ${state.endDm.localMinute()} "),
-                                onPressed: () async {
-                                  final TimeOfDay? picked =
-                                      await showTimePicker(
-                                    context: context,
-                                    initialTime: TimeOfDay.fromDateTime(
-                                        state.endDm.toDateTime()),
-                                  );
-                                  if (picked != null) {
-                                    // Dispatch the selected time to the Bloc
-                                    context.read<SwitchCubit>().setDateMinute(
-                                        DateMinute.fromTimeOfDay(picked));
-                                  }
-                                },
-                              ),
-                            ],
-                          )),
+                                  const Text("  min",
+                                      style: TextStyle(fontSize: 18)),
+                                ],
+                              )),
+                          Padding(
+                              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                              child: Row(
+                                children: [
+                                  Text("End at",
+                                      style: TextStyle(fontSize: 18)),
+                                  Spacer(),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      side: BorderSide(
+                                          color: Colors.grey,
+                                          width: 1), // Border
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            4), // Match OutlineInputBorder
+                                      ),
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 4,
+                                          horizontal: 8), // Padding
+                                    ),
+                                    child: Text(state.endDm.toHHMM(),
+                                        style: TextStyle(fontSize: 18)),
+                                    onPressed: () async {
+                                      final TimeOfDay? picked =
+                                          await showTimePicker(
+                                        context: context,
+                                        initialTime: TimeOfDay.fromDateTime(
+                                            state.endDm.toDateTime()),
+                                      );
+                                      if (picked != null) {
+                                        // Dispatch the selected time to the Bloc
+                                        context
+                                            .read<SwitchCubit>()
+                                            .setDateMinute(
+                                                DateMinute.fromTimeOfDay(
+                                                    picked));
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )),
+                        ],
+                      ),
                       const Spacer(),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize:
+                                    Size(120, 50), // Minimum height of 50
+                              ),
                               onPressed: () {
                                 context.maybePop();
                               },
-                              child: const Text("Cancel"),
+                              child: const Text(
+                                "Cancel",
+                                style: TextStyle(fontSize: 16),
+                              ),
                             ),
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                minimumSize:
+                                    Size(120, 50), // Minimum height of 50
+                              ),
                               onPressed: () {
                                 context.read<SwitchCubit>().start();
                               },
-                              child: const Text("Let's Go"),
+                              child: const Text(
+                                "Let's Go",
+                                style: TextStyle(fontSize: 16),
+                              ),
                             ),
                           ],
                         ),

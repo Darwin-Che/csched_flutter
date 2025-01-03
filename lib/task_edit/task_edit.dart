@@ -62,7 +62,7 @@ class TaskEditViewBuilder extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-              child: _TaskPriorityField(),
+              child: _TaskTargetEffortField(),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -112,16 +112,16 @@ class _TaskNameField extends StatelessWidget {
   }
 }
 
-class _TaskPriorityField extends StatelessWidget {
+class _TaskTargetEffortField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final state = context.watch<TaskEditBloc>().state;
     return TextFormField(
-      key: const Key('TaskEditView_Priority_TextFormField'),
-      initialValue: '${state.priority}',
+      key: const Key('TaskEditView_TargetEffort_TextFormField'),
+      initialValue: '${state.targetEffort}',
       keyboardType: TextInputType.number,
       decoration: const InputDecoration(
-          border: UnderlineInputBorder(), labelText: 'Priority'),
+          border: UnderlineInputBorder(), labelText: 'Target Effort (hours per week)'),
       maxLength: 50,
       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       validator: (value) {
@@ -137,7 +137,7 @@ class _TaskPriorityField extends StatelessWidget {
       onChanged: (value) {
         context
             .read<TaskEditBloc>()
-            .add(TaskEditPriorityChanged(int.tryParse(value) ?? 0));
+            .add(TaskEditTargetEffortChanged(int.tryParse(value) ?? 0));
       },
     );
   }

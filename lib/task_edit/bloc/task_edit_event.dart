@@ -16,13 +16,13 @@ final class TaskEditTaskNameChanged extends TaskEditEvent {
   List<Object> get props => [name];
 }
 
-final class TaskEditPriorityChanged extends TaskEditEvent {
-  const TaskEditPriorityChanged(this.priority);
+final class TaskEditTargetEffortChanged extends TaskEditEvent {
+  const TaskEditTargetEffortChanged(this.targetEffort);
 
-  final int priority;
+  final int targetEffort;
 
   @override
-  List<Object> get props => [priority];
+  List<Object> get props => [targetEffort];
 }
 
 final class TaskEditDescriptionChanged extends TaskEditEvent {
