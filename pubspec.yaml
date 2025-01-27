@@ -48,7 +48,8 @@ dependencies:
     path: packages/tasks_repository
   bloc: ^8.1.4
   rxdart: ^0.28.0
-  
+  flutter_local_notifications: ^18.0.1
+  flutter_timezone: ^4.0.0
 
 dev_dependencies:
   flutter_test:

@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:csched_flutter/helper/date_minute.dart';
+import 'package:csched_flutter/helper/time_helper.dart';
+import 'package:csched_flutter/notification/notif_wrapper.dart';
 import 'package:equatable/equatable.dart';
 import 'package:tasks_api/tasks_api.dart';
 import 'package:tasks_repository/tasks_repository.dart';
@@ -52,7 +56,7 @@ class SwitchCubit extends Cubit<SwitchState> {
 
   Future<void> start() async {
     if (state.status == SwitchStateStatus.waiting) {
-      if (state.selectedOption != null) {
+      if (state.selectedOption != null && state.endDm.minutesSinceEpoch > DateMinute.now().minutesSinceEpoch) {
         DateMinute now = DateMinute.now();
         var currentProgress = _repo.getLatestProgressModel();
         if (currentProgress!= null && currentProgress.endDm > now.toInt()) {
@@ -60,14 +64,38 @@ class SwitchCubit extends Cubit<SwitchState> {
           await _repo.editLatestProgressModel(currentProgress);
         }
 
-        await _repo.addNewProgressModel(ProgressModel(
+        final newProgressModel = ProgressModel(
           taskId: state.selectedOption!,
           duration: state.endDm - now,
           startDm: now.toInt(),
           endDm: state.endDm.toInt(),
-        ));
+        );
+
+        await _repo.addNewProgressModel(newProgressModel);
+
+        await NotifWrapper.deleteAllPending();
+        await scheduleReminderNotifications(newProgressModel);
+
         emit(state.copyWith(status: SwitchStateStatus.success));
       }
     }
+  }
+}
+
+Future<void> scheduleReminderNotifications(ProgressModel progressModel) async {
+  final alertAfterEnd = [
+    0, 5, 10, 15, 20, 25, 30, 35, 45, 60, 75, 90, 120, 150, 180, 210, 240, 270, 300,
+  ];
+
+  final endDateTime = DateMinute.fromInt(progressModel.endDm).toDateTime();
+  final countSeconds = (endDateTime.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch) ~/ 1000;
+
+  for (final (i, m) in alertAfterEnd.indexed) {
+    NotifWrapper.schedule(
+      id: i,
+      title: "Csched: What's next!",
+      body: m == 0 ? "Congrats! Task finished!" : "It has been ${TimeHelper.formatMinutes(m)}!",
+      seconds: 5 + countSeconds + m * 60,
+    );
   }
 }

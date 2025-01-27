@@ -1,4 +1,5 @@
 import 'package:csched_flutter/bootstrap.dart';
+import 'package:csched_flutter/notification/notif_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:local_storage_tasks_api/local_storage_tasks_api.dart';
 
@@ -10,6 +11,7 @@ void main() async {
 
   final tasksApi = await LocalStorageTasksApi.create();
 
+  await NotifWrapper.initialize();
+
   bootstrap(tasksApi: tasksApi);
 }
-

@@ -8,8 +8,8 @@ class TimerCubit extends Cubit<int> {
   Timer? _timer;
 
   void startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      emit(state + 1); // Increment the counter
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      emit(DateTime.now().millisecondsSinceEpoch ~/ 1000); // Increment the counter
     });
   }
 

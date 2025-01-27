@@ -55,8 +55,8 @@ class SwitchView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         child: Text(
                           "Task Options",
                           style: TextStyle(
@@ -89,9 +89,9 @@ class SwitchView extends StatelessWidget {
                           );
                         },
                       ),
-                      Divider(),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(32, 16, 32, 16),
+                      const Divider(),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         child: Text(
                           "Timing",
                           style: TextStyle(
@@ -112,7 +112,7 @@ class SwitchView extends StatelessWidget {
                                   SizedBox(
                                     width: 50,
                                     child: TextFormField(
-                                      style: TextStyle(fontSize: 18),
+                                      style: const TextStyle(fontSize: 18),
                                       controller: _controllerDuration,
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
@@ -121,10 +121,10 @@ class SwitchView extends StatelessWidget {
                                         LengthLimitingTextInputFormatter(3),
                                       ],
                                       textAlign: TextAlign.right,
-                                      decoration: InputDecoration(
+                                      decoration: const InputDecoration(
                                         isDense: true,
                                         contentPadding:
-                                            const EdgeInsets.symmetric(
+                                            EdgeInsets.symmetric(
                                                 vertical: 6, horizontal: 8),
                                         border: OutlineInputBorder(),
                                       ),
@@ -145,24 +145,24 @@ class SwitchView extends StatelessWidget {
                               padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                               child: Row(
                                 children: [
-                                  Text("End at",
+                                  const Text("End at",
                                       style: TextStyle(fontSize: 18)),
-                                  Spacer(),
+                                  const Spacer(),
                                   TextButton(
                                     style: TextButton.styleFrom(
-                                      side: BorderSide(
+                                      side: const BorderSide(
                                           color: Colors.grey,
                                           width: 1), // Border
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(
                                             4), // Match OutlineInputBorder
                                       ),
-                                      padding: EdgeInsets.symmetric(
+                                      padding: const EdgeInsets.symmetric(
                                           vertical: 4,
                                           horizontal: 8), // Padding
                                     ),
                                     child: Text(state.endDm.toHHMM(),
-                                        style: TextStyle(fontSize: 18)),
+                                        style: const TextStyle(fontSize: 18)),
                                     onPressed: () async {
                                       final TimeOfDay? picked =
                                           await showTimePicker(
@@ -193,7 +193,7 @@ class SwitchView extends StatelessWidget {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 minimumSize:
-                                    Size(120, 50), // Minimum height of 50
+                                    const Size(120, 50), // Minimum height of 50
                               ),
                               onPressed: () {
                                 context.maybePop();
@@ -206,7 +206,7 @@ class SwitchView extends StatelessWidget {
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 minimumSize:
-                                    Size(120, 50), // Minimum height of 50
+                                    const Size(120, 50), // Minimum height of 50
                               ),
                               onPressed: () {
                                 context.read<SwitchCubit>().start();

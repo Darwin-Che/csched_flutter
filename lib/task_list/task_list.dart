@@ -3,7 +3,6 @@ import 'package:csched_flutter/app/app_router.gr.dart';
 import 'package:csched_flutter/task_list/bloc/task_list_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tasks_api/tasks_api.dart';
 import 'package:tasks_repository/tasks_repository.dart';
 
 @RoutePage()
@@ -74,7 +73,7 @@ class TaskListView extends StatelessWidget {
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) {
-                      return Divider(
+                      return const Divider(
                         color: Colors.grey,
                         thickness: 1,
                         height: 0,

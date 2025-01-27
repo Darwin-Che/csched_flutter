@@ -141,8 +141,7 @@ class LocalStorageTasksApi extends TasksApi {
     final progress = _latestProgressStreamController.value;
 
     if (progress != null &&
-        (progress.startDm > progressModel.endDm ||
-            progress.endDm > progressModel.endDm)) {
+        (progress.startDm > progressModel.endDm)) {
       throw FormatException('addNewProgressModel $progress $progressModel');
     }
 

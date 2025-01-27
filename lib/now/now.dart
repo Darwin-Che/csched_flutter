@@ -87,9 +87,9 @@ class NowView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text("Start you first Progress!"),
+                          const Text("Start you first Progress!"),
                           TextButton(
-                            child: Text("SWITCH"),
+                            child: const Text("SWITCH"),
                             onPressed: () =>
                                 {context.pushRoute(const SwitchRoute())},
                           ),
@@ -102,10 +102,10 @@ class NowView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(
+                          const Text(
                               "Error: The task associated with the progress is not found"),
                           TextButton(
-                            child: Text("SWITCH"),
+                            child: const Text("SWITCH"),
                             onPressed: () =>
                                 {context.pushRoute(const SwitchRoute())},
                           ),
@@ -123,7 +123,7 @@ class NowView extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        if (!isProgressActive) SectionTitle(text: "Pending"),
+                        if (!isProgressActive) const SectionTitle(text: "Pending"),
                         if (!isProgressActive)
                           Padding(
                             padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
@@ -132,18 +132,20 @@ class NowView extends StatelessWidget {
                                   DateTime.now().millisecondsSinceEpoch ~/
                                           1000 -
                                       progressModel.endDm * 60),
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ),
-                        if (!isProgressActive) Divider(),
-                        if (!isProgressActive) SectionTitle(text: "Previous Task"),
-                        if (isProgressActive) SectionTitle(text: "Current Task"),
+                        if (!isProgressActive) const Divider(),
+                        if (!isProgressActive)
+                          const SectionTitle(text: "Previous Task"),
+                        if (isProgressActive)
+                          const SectionTitle(text: "Current Task"),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(32, 0, 32, 16),
                           child: Text(
                             "${taskModel.name}",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blueGrey),
@@ -153,7 +155,7 @@ class NowView extends StatelessWidget {
                           progressModel: progressModel,
                           curSecond: timerState,
                         ),
-                        SizedBox(height: 28),
+                        const SizedBox(height: 28),
                         LayoutBuilder(builder: (context, constraints) {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -161,18 +163,18 @@ class NowView extends StatelessWidget {
                               SizedBox(
                                 width: constraints.maxWidth / 2 - 20,
                                 child: TextFormField(
-                                    style: TextStyle(fontSize: 12),
+                                    style: const TextStyle(fontSize: 12),
                                     controller: _controllerStartComment,
                                     keyboardType: TextInputType.multiline,
                                     maxLines: 8,
                                     minLines: 8,
                                     inputFormatters: [],
                                     textAlign: TextAlign.left,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       hintText: "StartComment",
                                       isDense: true,
                                       contentPadding:
-                                          const EdgeInsets.symmetric(
+                                          EdgeInsets.symmetric(
                                               vertical: 8, horizontal: 8),
                                       border: OutlineInputBorder(),
                                     ),
@@ -184,18 +186,18 @@ class NowView extends StatelessWidget {
                               SizedBox(
                                 width: constraints.maxWidth / 2 - 20,
                                 child: TextFormField(
-                                    style: TextStyle(fontSize: 12),
+                                    style: const TextStyle(fontSize: 12),
                                     controller: _controllerEndComment,
                                     keyboardType: TextInputType.multiline,
                                     maxLines: 8,
                                     minLines: 8,
                                     inputFormatters: [],
                                     textAlign: TextAlign.left,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       hintText: "EndComment",
                                       isDense: true,
                                       contentPadding:
-                                          const EdgeInsets.symmetric(
+                                          EdgeInsets.symmetric(
                                               vertical: 8, horizontal: 8),
                                       border: OutlineInputBorder(),
                                     ),
@@ -207,7 +209,7 @@ class NowView extends StatelessWidget {
                             ],
                           );
                         }),
-                        Spacer(),
+                        const Spacer(),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
                           child: Row(
@@ -216,14 +218,16 @@ class NowView extends StatelessWidget {
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   minimumSize:
-                                      Size(240, 50), // Minimum height of 50
+                                      const Size(240, 50), // Minimum height of 50
                                 ),
                                 onPressed: () {
                                   context.pushRoute(const SwitchRoute());
                                 },
                                 child: Text(
-                                  isProgressActive ? "Switch Early" : "On to Next",
-                                  style: TextStyle(fontSize: 16),
+                                  isProgressActive
+                                      ? "Switch Early"
+                                      : "On to Next",
+                                  style: const TextStyle(fontSize: 16),
                                 ),
                               ),
                             ],
@@ -252,23 +256,26 @@ class _ProgressBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                DateMinute.fromInt(progressModel.startDm).toHHMM() + "  ",
-                style: TextStyle(fontSize: 18),
+                "${DateMinute.fromInt(progressModel.startDm).toHHMM()}  ",
+                style: const TextStyle(fontSize: 18),
               ),
               SizedBox(
                 width: constraints.maxWidth / 2,
                 child: LinearProgressIndicator(
                   borderRadius: BorderRadius.circular(5),
-                  value: (curSecond - progressModel.startDm * 60) /
-                      (progressModel.endDm * 60 - progressModel.startDm * 60),
+                  value: progressModel.endDm == progressModel.startDm
+                      ? 1
+                      : (curSecond - progressModel.startDm * 60) /
+                          (progressModel.endDm * 60 -
+                              progressModel.startDm * 60),
                   backgroundColor: Colors.grey[300],
                   color: Colors.amberAccent,
                   minHeight: 10,
                 ),
               ),
               Text(
-                "  " + DateMinute.fromInt(progressModel.endDm).toHHMM(),
-                style: TextStyle(fontSize: 18),
+                "  ${DateMinute.fromInt(progressModel.endDm).toHHMM()}",
+                style: const TextStyle(fontSize: 18),
               ),
             ],
           ),
