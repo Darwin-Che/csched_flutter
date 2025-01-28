@@ -54,7 +54,7 @@ class TaskEditBloc extends Bloc<TaskEditEvent, TaskEditState> {
     emit(state.copyWith(status: TaskEditStatus.loading));
     final task = (state.initialTask ?? TaskModel()).copyWith(
       name: state.name,
-      priority: state.targetEffort,
+      targetEffort: state.targetEffort,
       description: state.description,
     );
 

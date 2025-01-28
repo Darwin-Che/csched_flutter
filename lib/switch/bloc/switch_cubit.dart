@@ -24,13 +24,12 @@ class SwitchCubit extends Cubit<SwitchState> {
     List<(TaskModel, double)> effortPercentageList = [];
     for (final task in tasks) {
       effortPercentageList
-          .add((task, (tasksEffort[task.id] ?? 0) / 60));
+          .add((task, (tasksEffort[task.id] ?? 0) - task.targetEffort));
     }
 
     // sort by effort percentage from small to large
     effortPercentageList.sort((a, b) => (a.$2 / a.$1.targetEffort).compareTo(b.$2 / b.$1.targetEffort));
     final options = effortPercentageList
-        .take(3)
         .map((record) =>
             SwitchTaskOption(taskModel: record.$1, effort: record.$2))
         .toList();

@@ -170,10 +170,26 @@ class LocalStorageTasksApi extends TasksApi {
     for (final progress in progresses) {
       // check how many weeks are between the task and current time
       final weeks = (curDm - progress.endDm) ~/ (24 * 60 * 7);
-      final multiplier = pow(2.0, weeks).toDouble();
+      final multiplier = 1.0 / 60.0 / pow(2.0, weeks).toDouble();
 
       tasksEffort[progress.taskId] =
           (tasksEffort[progress.taskId] ?? 0) + progress.duration * multiplier;
+    }
+
+    final tasksJson = await db.query('task');
+    final tasks = tasksJson.map(TaskModel.fromJson).toList();
+
+    // We should make sure that the weeks before createdAtDm are treated as full
+    for (final task in tasks) {
+      final minutesSinceStart = curDm - task.createdAtDm;
+      final weeks = minutesSinceStart ~/ (24 * 60 * 7);
+      final remainder = minutesSinceStart - weeks * 24 * 60 * 7;
+
+      final effortPrevWeeks = 1 / pow(2.0, weeks).toDouble();
+      final effortThisWeek = 1 / pow(2.0, weeks).toDouble() * (24 * 60 * 7 - remainder) / (24 * 60 * 7);
+      final effort = effortPrevWeeks + effortThisWeek;
+
+      tasksEffort[task.id] = (tasksEffort[task.id] ?? 0) + effort * task.targetEffort;
     }
 
     return tasksEffort;

@@ -15,6 +15,7 @@ class TaskModel extends Equatable {
   final String description;
   final int targetEffort;
   final TaskModelStatus status;
+  final int createdAtDm;
 
   TaskModel({
     this.name = '',
@@ -22,11 +23,14 @@ class TaskModel extends Equatable {
     String? id,
     this.description = '',
     this.status = TaskModelStatus.active,
+    int? createdAtDm,
   })  : assert(
           id == null || id.isNotEmpty,
           'id must either be null or not empty',
         ),
-        id = id ?? const Uuid().v4();
+        id = id ?? const Uuid().v4(),
+        createdAtDm =
+            createdAtDm ?? (DateTime.now().millisecondsSinceEpoch ~/ 60000);
 
   factory TaskModel.fromJson(JsonMap json) => _$TaskModelFromJson(json);
   JsonMap toJson() => _$TaskModelToJson(this);
@@ -35,18 +39,20 @@ class TaskModel extends Equatable {
     String? id,
     String? name,
     String? description,
-    int? priority,
+    int? targetEffort,
     TaskModelStatus? status,
+    int? createdAtDm,
   }) {
     return TaskModel(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      targetEffort: priority ?? this.targetEffort,
+      targetEffort: targetEffort ?? this.targetEffort,
       status: status ?? this.status,
+      createdAtDm: createdAtDm ?? this.createdAtDm,
     );
   }
 
   @override
-  List<Object> get props => [id, name, description, targetEffort, status];
+  List<Object> get props => [id, name, description, targetEffort, status, createdAtDm];
 }

@@ -60,42 +60,55 @@ class SwitchView extends StatelessWidget {
                         child: Text(
                           "Task Options",
                           style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                              fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                       ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        itemCount: state.options.length,
-                        itemBuilder: (context, index) {
-                          final option = state.options[index];
-                          return ListTile(
-                            tileColor:
-                                state.selectedOption == option.taskModel.id
-                                    ? Colors.blue.shade100
-                                    : null,
-                            leading:
-                                const Icon(Icons.label, color: Colors.blue),
-                            title: Text(option.taskModel.name,
-                                style: const TextStyle(fontSize: 20)),
-                            trailing: Text(
-                                '${option.effort.toStringAsFixed(1)} / ${option.taskModel.targetEffort}',
-                                style: const TextStyle(fontSize: 18)),
-                            onTap: () {
-                              context
-                                  .read<SwitchCubit>()
-                                  .selectOption(option.taskModel.id);
-                            },
-                          );
-                        },
-                      ),
+                      SizedBox(
+                          height: 260,
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                  8.0), // Optional for rounded corners
+                              child: Material(
+                                  type: MaterialType
+                                      .transparency, // Use transparency to retain ripple
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    padding:
+                                        const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                    itemCount: state.options.length,
+                                    itemBuilder: (context, index) {
+                                      final option = state.options[index];
+                                      return ListTile(
+                                        dense: true,
+                                        tileColor: state.selectedOption ==
+                                                option.taskModel.id
+                                            ? Colors.blue.shade100
+                                            : null,
+                                        leading: const Icon(Icons.label,
+                                            color: Colors.blue),
+                                        title: Text(option.taskModel.name,
+                                            style:
+                                                const TextStyle(fontSize: 18)),
+                                        trailing: Text(
+                                            '${option.effort.toStringAsFixed(1)} / ${option.taskModel.targetEffort}',
+                                            style:
+                                                const TextStyle(fontSize: 16)),
+                                        onTap: () {
+                                          context
+                                              .read<SwitchCubit>()
+                                              .selectOption(
+                                                  option.taskModel.id);
+                                        },
+                                      );
+                                    },
+                                  )))),
                       const Divider(),
                       const Padding(
                         padding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                         child: Text(
                           "Timing",
                           style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
+                              fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                       ),
                       ListView(
@@ -107,12 +120,12 @@ class SwitchView extends StatelessWidget {
                               child: Row(
                                 children: [
                                   const Text("Duration",
-                                      style: TextStyle(fontSize: 18)),
+                                      style: TextStyle(fontSize: 16)),
                                   const Spacer(),
                                   SizedBox(
                                     width: 50,
                                     child: TextFormField(
-                                      style: const TextStyle(fontSize: 18),
+                                      style: const TextStyle(fontSize: 16),
                                       controller: _controllerDuration,
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
@@ -123,9 +136,8 @@ class SwitchView extends StatelessWidget {
                                       textAlign: TextAlign.right,
                                       decoration: const InputDecoration(
                                         isDense: true,
-                                        contentPadding:
-                                            EdgeInsets.symmetric(
-                                                vertical: 6, horizontal: 8),
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 6, horizontal: 8),
                                         border: OutlineInputBorder(),
                                       ),
                                       onChanged: (value) {
@@ -138,7 +150,7 @@ class SwitchView extends StatelessWidget {
                                     ),
                                   ),
                                   const Text("  min",
-                                      style: TextStyle(fontSize: 18)),
+                                      style: TextStyle(fontSize: 16)),
                                 ],
                               )),
                           Padding(
@@ -146,7 +158,7 @@ class SwitchView extends StatelessWidget {
                               child: Row(
                                 children: [
                                   const Text("End at",
-                                      style: TextStyle(fontSize: 18)),
+                                      style: TextStyle(fontSize: 16)),
                                   const Spacer(),
                                   TextButton(
                                     style: TextButton.styleFrom(
@@ -162,7 +174,7 @@ class SwitchView extends StatelessWidget {
                                           horizontal: 8), // Padding
                                     ),
                                     child: Text(state.endDm.toHHMM(),
-                                        style: const TextStyle(fontSize: 18)),
+                                        style: const TextStyle(fontSize: 16)),
                                     onPressed: () async {
                                       final TimeOfDay? picked =
                                           await showTimePicker(
@@ -186,7 +198,7 @@ class SwitchView extends StatelessWidget {
                       ),
                       const Spacer(),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+                        padding: const EdgeInsets.fromLTRB(24, 14, 24, 28),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

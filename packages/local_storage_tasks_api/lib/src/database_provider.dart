@@ -69,7 +69,8 @@ class DatabaseProvider {
             name TEXT NOT NULL,
             targetEffort INTEGER NOT NULL,
             status TEXT NOT NULL,
-            description TEXT
+            description TEXT,
+            createdAtDm INTEGER NOT NULL 
           )
           ''');
         await db.execute('''
